@@ -10,7 +10,8 @@ const swaggerDefinition = {
       "A distributed Rate Limiter API built with Express, Redis, and express-rate-limit. " +
       "Demonstrates API abuse prevention with multiple rate limiting tiers.",
     contact: {
-      name: "API Support",
+      name: "Serkanby",
+      url: "https://serkanbayraktar.com/",
     },
   },
   servers: [
