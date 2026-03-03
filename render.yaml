@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: rate-limiter-api
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: rate-limiter-redis
+          property: connectionString
+      - key: RATE_LIMIT_WINDOW_MS
+        value: "900000"
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: "100"
+
+  - type: redis
+    name: rate-limiter-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []
