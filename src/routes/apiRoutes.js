@@ -19,6 +19,11 @@ const {
  *     responses:
  *       200:
  *         description: Successful response
+ *         headers:
+ *           X-Request-Id:
+ *             $ref: '#/components/headers/XRequestId'
+ *           X-Response-Time:
+ *             $ref: '#/components/headers/XResponseTime'
  *         content:
  *           application/json:
  *             schema:

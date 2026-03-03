@@ -87,6 +87,23 @@ const swaggerDefinition = {
         },
       },
     },
+    headers: {
+      XRequestId: {
+        description: "Unique identifier for the request — useful for tracing and debugging",
+        schema: {
+          type: "string",
+          format: "uuid",
+          example: "550e8400-e29b-41d4-a716-446655440000",
+        },
+      },
+      XResponseTime: {
+        description: "Server processing time in milliseconds",
+        schema: {
+          type: "string",
+          example: "12.45ms",
+        },
+      },
+    },
   },
 };
 

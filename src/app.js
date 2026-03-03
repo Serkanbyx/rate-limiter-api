@@ -4,12 +4,18 @@ const helmet = require("helmet");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swagger");
 const errorHandler = require("./middlewares/errorHandler");
+const requestId = require("./middlewares/requestId");
+const responseTime = require("./middlewares/responseTime");
 const healthRoutes = require("./routes/healthRoutes");
 const createApiRoutes = require("./routes/apiRoutes");
 const { version } = require("../package.json");
 
 const createApp = ({ globalLimiter, strictLimiter, authLimiter }) => {
   const app = express();
+
+  // Request tracing & performance
+  app.use(requestId);
+  app.use(responseTime);
 
   // Security & parsing
   app.use(helmet());
