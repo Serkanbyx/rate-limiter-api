@@ -93,7 +93,7 @@ const {
  *     description: >
  *       Simulates a login endpoint with aggressive rate limiting to prevent brute-force attacks.
  *       Allows only 5 requests per 15-minute window.
- *       Use username: "admin", password: "password123" for a successful demo login.
+ *       Demo credentials are configured via DEMO_USERNAME and DEMO_PASSWORD environment variables.
  *     tags: [Authentication]
  *     requestBody:
  *       required: true

@@ -17,9 +17,17 @@ services:
         value: "900000"
       - key: RATE_LIMIT_MAX_REQUESTS
         value: "100"
+      - key: DEMO_USERNAME
+        value: admin
+      - key: DEMO_PASSWORD
+        value: password123
+      - key: DEMO_TOKEN
+        value: demo-jwt-token-abc123
+      - key: DEMO_SECRET
+        value: rate-limiter-demo-secret-data
 
   - type: redis
     name: rate-limiter-redis
     plan: free
     maxmemoryPolicy: allkeys-lru
-    ipAllowList: []
+    ipAllowList: [] # Render internally restricts access to linked services only

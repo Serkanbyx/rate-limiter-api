@@ -1,4 +1,5 @@
 const { getRedisClient, isRedisConnected } = require("../config/redis");
+const env = require("../config/env");
 
 const getPublicResource = (_req, res) => {
   res.json({
@@ -18,7 +19,7 @@ const getProtectedResource = (_req, res) => {
     data: {
       timestamp: new Date().toISOString(),
       info: "This endpoint allows only 10 requests per 1-minute window.",
-      secret: "rate-limiter-demo-secret-data",
+      secret: env.demoSecret,
     },
   });
 };
@@ -33,11 +34,11 @@ const simulateLogin = (req, res) => {
     });
   }
 
-  if (username === "admin" && password === "password123") {
+  if (username === env.demoUsername && password === env.demoPassword) {
     return res.json({
       success: true,
       message: "Login successful (demo only).",
-      data: { token: "demo-jwt-token-abc123" },
+      data: { token: env.demoToken },
     });
   }
 
