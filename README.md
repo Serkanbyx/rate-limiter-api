@@ -14,6 +14,8 @@ A distributed Rate Limiter API built with **Express**, **Redis**, and **express-
 - **Health Check** — Monitors API uptime and Redis connection status in real time
 - **Rate Limit Management** — Check your current rate limit status and reset limits via dedicated API endpoints
 - **Security Headers** — Helmet.js for HTTP security best practices (XSS, HSTS, CSP, etc.)
+- **Proxy-Aware** — Honors `trust proxy` so the real client IP is used behind reverse proxies (Render, Nginx, etc.)
+- **Non-Blocking Redis Scans** — Uses `SCAN` instead of `KEYS` to inspect and reset counters without blocking the Redis event loop
 - **Graceful Shutdown** — Clean Redis disconnection and server close on SIGTERM/SIGINT signals
 - **RFC Draft-7 Headers** — Standard `RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset` response headers
 
@@ -119,6 +121,14 @@ const store = isRedisConnected()
 
 When Redis is available, all rate limit counters are stored in Redis with prefixed keys (`rl:global:`, `rl:strict:`, `rl:auth:`), enabling distributed rate limiting across multiple server instances. If Redis is unavailable, the limiter falls back to an in-memory store automatically.
 
+### Client IP Detection
+
+The app sets `trust proxy` so that when it runs behind a reverse proxy (Render, Nginx, Heroku, etc.), `req.ip` resolves to the real client IP from the `X-Forwarded-For` header instead of the proxy's IP. This ensures rate limits are applied per actual client rather than collapsing every user onto a single proxy address.
+
+### Inspecting & Resetting Counters
+
+Counter inspection (`/api/rate-limit/status`) and reset (`/api/rate-limit/reset`) iterate Redis keys with the non-blocking `SCAN` command rather than `KEYS`, avoiding O(N) blocking of the Redis event loop in production. Reset matches keys with the pattern `rl:*:<ip>`, anchoring the IP at the end so resetting `127.0.0.1` does not accidentally clear similar addresses like `127.0.0.10`.
+
 ### Response Headers (RFC Draft-7)
 
 Every response includes standard rate limit headers:
@@ -204,7 +214,11 @@ src/
 └── server.js               # Server entry point & graceful shutdown
 ```
 
+For a full step-by-step walkthrough of how this project was built, see the [Build Guide](docs/build-guide.md).
+
 ## Contributing
+
+Contributions are welcome! Please read the [Contributing Guide](.github/CONTRIBUTING.md) and the [Code of Conduct](.github/CODE_OF_CONDUCT.md) before getting started.
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feat/amazing-feature`)
@@ -216,6 +230,8 @@ src/
    - `chore:` — Maintenance tasks
 4. Push to the branch (`git push origin feat/amazing-feature`)
 5. Open a Pull Request
+
+To report a security vulnerability, please follow our [Security Policy](.github/SECURITY.md).
 
 ## License
 

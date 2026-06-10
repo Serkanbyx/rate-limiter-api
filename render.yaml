@@ -19,12 +19,13 @@ services:
         value: "100"
       - key: DEMO_USERNAME
         value: admin
+      # Secrets are managed in the Render dashboard, not committed to the blueprint.
       - key: DEMO_PASSWORD
-        value: password123
+        sync: false
       - key: DEMO_TOKEN
-        value: demo-jwt-token-abc123
+        sync: false
       - key: DEMO_SECRET
-        value: rate-limiter-demo-secret-data
+        sync: false
 
   - type: redis
     name: rate-limiter-redis

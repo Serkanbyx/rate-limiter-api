@@ -13,6 +13,10 @@ const { version } = require("../package.json");
 const createApp = ({ globalLimiter, strictLimiter, authLimiter }) => {
   const app = express();
 
+  // Trust the first proxy hop (Render, Heroku, Nginx, etc.) so req.ip reflects
+  // the real client IP instead of the proxy's — essential for correct rate limiting.
+  app.set("trust proxy", 1);
+
   // Request tracing & performance
   app.use(requestId);
   app.use(responseTime);

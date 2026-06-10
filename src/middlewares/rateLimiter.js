@@ -24,17 +24,17 @@ const createStore = (prefix) => {
 
 const createRateLimiter = ({
   windowMs = env.rateLimitWindowMs,
-  max = env.rateLimitMaxRequests,
+  limit = env.rateLimitMaxRequests,
   message = "Too many requests, please try again later.",
   prefix = "rl:",
 } = {}) => {
   const store = createStore(prefix);
   const storeType = store ? "Redis" : "Memory";
-  console.log(`[RateLimiter] ${prefix} -> ${storeType} store (${max} req / ${windowMs / 1000}s)`);
+  console.log(`[RateLimiter] ${prefix} -> ${storeType} store (${limit} req / ${windowMs / 1000}s)`);
 
   return rateLimit({
     windowMs,
-    max,
+    limit,
     standardHeaders: "draft-7",
     legacyHeaders: false,
     store,
@@ -56,14 +56,14 @@ const initRateLimiters = () => {
 
   const strictLimiter = createRateLimiter({
     windowMs: 60 * 1000,
-    max: 10,
+    limit: 10,
     message: "Rate limit exceeded for this endpoint. Please wait before retrying.",
     prefix: "rl:strict:",
   });
 
   const authLimiter = createRateLimiter({
     windowMs: 15 * 60 * 1000,
-    max: 5,
+    limit: 5,
     message: "Too many authentication attempts. Please try again later.",
     prefix: "rl:auth:",
   });

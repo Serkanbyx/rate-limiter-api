@@ -12,7 +12,7 @@ const connectRedis = async (timeoutMs = 3000) => {
   return new Promise((resolve) => {
     try {
       redisClient = new Redis(env.redisUrl, {
-        maxRetriesPerRequest: 20,
+        maxRetriesPerRequest: 5,
         retryStrategy(times) {
           if (times > 5) return null;
           return Math.min(times * 200, 2000);

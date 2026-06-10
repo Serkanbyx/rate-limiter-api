@@ -1,6 +1,23 @@
 const { getRedisClient, isRedisConnected } = require("../config/redis");
 const env = require("../config/env");
 
+/**
+ * Iterates over all keys matching a pattern using non-blocking SCAN.
+ * Preferred over KEYS, which blocks the Redis event loop (O(N)) in production.
+ */
+const scanKeys = async (client, pattern, count = 100) => {
+  const found = [];
+  let cursor = "0";
+
+  do {
+    const [nextCursor, batch] = await client.scan(cursor, "MATCH", pattern, "COUNT", count);
+    cursor = nextCursor;
+    found.push(...batch);
+  } while (cursor !== "0");
+
+  return found;
+};
+
 const getPublicResource = (_req, res) => {
   res.json({
     success: true,
@@ -71,7 +88,7 @@ const getRateLimitStatus = async (req, res) => {
 
   try {
     const redisClient = getRedisClient();
-    const keys = await redisClient.keys("rl:*");
+    const keys = await scanKeys(redisClient, "rl:*");
 
     res.json({
       success: true,
@@ -106,7 +123,10 @@ const resetRateLimit = async (req, res) => {
     const { ip } = req.query;
     const targetIp = ip || req.ip;
 
-    const keys = await redisClient.keys(`rl:*${targetIp}*`);
+    // Keys are stored as "<prefix>:<ip>" (e.g. "rl:global:127.0.0.1").
+    // Anchoring the IP at the end avoids accidentally matching similar IPs
+    // such as "127.0.0.10" when resetting "127.0.0.1".
+    const keys = await scanKeys(redisClient, `rl:*:${targetIp}`);
 
     if (keys.length > 0) {
       await redisClient.del(...keys);
